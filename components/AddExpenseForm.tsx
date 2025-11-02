@@ -1,19 +1,30 @@
+
 import React, { useState } from 'react';
-import type { Transaction, Category } from '../types';
+import type { Transaction, Category, Account } from '../types';
+import { CURRENCIES } from '../constants';
 
 interface AddTransactionFormProps {
   onClose: () => void;
   onAddTransaction: (transaction: Omit<Transaction, 'id'>) => void;
   categories: Category[];
+  accounts: Account[];
+  selectedAccountId: string | 'all';
 }
 
-const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ onClose, onAddTransaction, categories }) => {
+const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ onClose, onAddTransaction, categories, accounts, selectedAccountId }) => {
   const [transactionType, setTransactionType] = useState<'expense' | 'income'>('expense');
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [categoryId, setCategoryId] = useState(categories.length > 0 ? categories[0].id : '');
+  const [accountId, setAccountId] = useState(() => {
+    if (selectedAccountId !== 'all') return selectedAccountId;
+    return accounts.length > 0 ? accounts[0].id : '';
+  });
   const [error, setError] = useState('');
+
+  const selectedAccount = accounts.find(a => a.id === accountId);
+  const currencySymbol = CURRENCIES.find(c => c.code === selectedAccount?.currency)?.symbol || '€';
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,8 +33,13 @@ const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ onClose, onAddT
       setError('Per favore, compila tutti i campi con valori validi.');
       return;
     }
+    if (!accountId) {
+      setError('Per favore, seleziona un conto.');
+      return;
+    }
     
     const transactionData: Omit<Transaction, 'id'> = {
+      accountId,
       description,
       amount: parsedAmount,
       date: new Date(date).toISOString(),
@@ -70,6 +86,20 @@ const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ onClose, onAddT
             </div>
 
             <div>
+              <label htmlFor="account" className="block text-sm font-medium text-slate-700 mb-1">Conto</label>
+              <select
+                id="account"
+                value={accountId}
+                onChange={(e) => setAccountId(e.target.value)}
+                className="w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+              >
+                {accounts.map(account => (
+                  <option key={account.id} value={account.id}>{account.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
               <label htmlFor="description" className="block text-sm font-medium text-slate-700 mb-1">Descrizione</label>
               <input
                 type="text"
@@ -81,7 +111,7 @@ const AddTransactionForm: React.FC<AddTransactionFormProps> = ({ onClose, onAddT
               />
             </div>
             <div>
-              <label htmlFor="amount" className="block text-sm font-medium text-slate-700 mb-1">Importo (€)</label>
+              <label htmlFor="amount" className="block text-sm font-medium text-slate-700 mb-1">Importo ({currencySymbol})</label>
               <input
                 type="number"
                 id="amount"

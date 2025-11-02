@@ -10,9 +10,10 @@ interface ChartData {
 interface CategoryPieChartProps {
   data: ChartData[];
   categories: Category[];
+  currency?: string;
 }
 
-const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ data, categories }) => {
+const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ data, categories, currency }) => {
   const chartData = data.map(item => {
     const category = categories.find(c => c.id === item.categoryId);
     return {
@@ -40,6 +41,13 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ data, categories })
       </text>
     );
   };
+
+  const tooltipFormatter = (value: number) => {
+    const formattedValue = currency 
+      ? new Intl.NumberFormat('it-IT', { style: 'currency', currency }).format(value)
+      : new Intl.NumberFormat('it-IT').format(value);
+    return [formattedValue, "Importo"];
+  }
   
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -60,7 +68,7 @@ const CategoryPieChart: React.FC<CategoryPieChartProps> = ({ data, categories })
             <Cell key={`cell-${index}`} fill={entry.color} />
           ))}
         </Pie>
-        <Tooltip formatter={(value: number) => [new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(value), "Importo"]} />
+        <Tooltip formatter={tooltipFormatter} />
         <Legend iconSize={10} layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{fontSize: '12px'}} />
       </PieChart>
     </ResponsiveContainer>

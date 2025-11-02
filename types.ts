@@ -1,5 +1,13 @@
+export interface Account {
+  id: string;
+  name: string;
+  initialBalance: number;
+  currency: string;
+}
+
 export interface Transaction {
   id: string;
+  accountId: string;
   description: string;
   amount: number;
   categoryId?: string;
@@ -8,13 +16,14 @@ export interface Transaction {
 }
 
 export interface Category {
-  id: string;
+  id:string;
   name: string;
   color: string;
 }
 
 export interface RecurringTransaction {
   id: string;
+  accountId: string;
   description: string;
   amount: number;
   categoryId?: string;

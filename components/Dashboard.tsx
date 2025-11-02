@@ -7,14 +7,15 @@ import TrendChart from './TrendChart';
 import { WalletIcon, ArrowTrendingUpIcon, ArrowTrendingDownIcon, ScaleIcon } from './Icons';
 
 interface DashboardProps {
-  initialBalance: number;
-  transactions: Transaction[]; // Tutte le transazioni per il saldo totale
-  filteredTransactions: Transaction[]; // Transazioni del periodo selezionato
+  currentBalance: number;
+  filteredTransactions: Transaction[];
   categories: Category[];
   filter: Filter;
+  currency?: string;
+  view: 'single_account' | 'all_accounts';
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ initialBalance, transactions, filteredTransactions, categories, filter }) => {
+const Dashboard: React.FC<DashboardProps> = ({ currentBalance, filteredTransactions, categories, filter, currency, view }) => {
   const [isBalanceVisible, setIsBalanceVisible] = useState(false);
 
   const { periodIncome, periodExpenses, expenseDataByCategory } = useMemo(() => {
@@ -40,24 +41,12 @@ const Dashboard: React.FC<DashboardProps> = ({ initialBalance, transactions, fil
     return { periodIncome, periodExpenses, expenseDataByCategory };
   }, [filteredTransactions]);
 
-  const { totalIncome, totalExpenses } = useMemo(() => {
-    let totalIncome = 0;
-    let totalExpenses = 0;
-    transactions.forEach(t => {
-      if (t.type === 'income') {
-        totalIncome += t.amount;
-      } else {
-        totalExpenses += t.amount;
-      }
-    });
-    return { totalIncome, totalExpenses };
-  }, [transactions]);
-
-
-  const currentBalance = initialBalance + totalIncome - totalExpenses;
-  
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(value);
+    if (currency) {
+      return new Intl.NumberFormat('it-IT', { style: 'currency', currency }).format(value);
+    }
+    // Fallback for multi-currency view
+    return new Intl.NumberFormat('it-IT').format(value);
   };
 
   const getChartTitle = () => {
@@ -67,15 +56,7 @@ const Dashboard: React.FC<DashboardProps> = ({ initialBalance, transactions, fil
             const end = new Date(filter.endDate).toLocaleDateString('it-IT');
             return `Spese dal ${start} al ${end}`;
         }
-        if (filter.startDate) {
-            const start = new Date(filter.startDate).toLocaleDateString('it-IT');
-            return `Spese dal ${start}`;
-        }
-        if (filter.endDate) {
-            const end = new Date(filter.endDate).toLocaleDateString('it-IT');
-            return `Spese fino al ${end}`;
-        }
-        return `Riepilogo Spese`;
+        return `Riepilogo Spese del Periodo`;
     }
 
     const monthNames = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
@@ -87,17 +68,22 @@ const Dashboard: React.FC<DashboardProps> = ({ initialBalance, transactions, fil
   
   const isAnnualView = filter.mode === 'month' && filter.month === 'all';
   const netBalance = periodIncome - periodExpenses;
+  
+  const balanceTitle = "Saldo Attuale";
+  const showBalanceCard = view === 'single_account' && !isNaN(currentBalance);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="lg:col-span-3">
-          <div className={`grid grid-cols-1 sm:grid-cols-2 gap-6 ${isAnnualView ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
-            <StatCard 
-              title="Saldo Attuale" 
-              value={isBalanceVisible ? formatCurrency(currentBalance) : '€ ****,**'} 
-              icon={<WalletIcon className="w-8 h-8 text-blue-500" />}
-              onIconClick={() => setIsBalanceVisible(prev => !prev)}
-            />
+          <div className={`grid grid-cols-1 sm:grid-cols-2 gap-6 ${isAnnualView ? (showBalanceCard ? 'lg:grid-cols-4' : 'lg:grid-cols-3') : (showBalanceCard ? 'lg:grid-cols-3' : 'lg:grid-cols-2') }`}>
+            {showBalanceCard && (
+              <StatCard 
+                title={balanceTitle}
+                value={isBalanceVisible ? formatCurrency(currentBalance) : '••••,••'} 
+                icon={<WalletIcon className="w-8 h-8 text-blue-500" />}
+                onIconClick={() => setIsBalanceVisible(prev => !prev)}
+              />
+            )}
             <StatCard 
               title={isAnnualView ? "Entrate Annuali" : "Entrate del Periodo"} 
               value={formatCurrency(periodIncome)} 
@@ -119,11 +105,11 @@ const Dashboard: React.FC<DashboardProps> = ({ initialBalance, transactions, fil
           </div>
       </div>
       <div className="lg:col-span-2 bg-white p-4 sm:p-6 rounded-xl shadow-md h-[320px]">
-        <TrendChart data={filteredTransactions} filter={filter} />
+        <TrendChart data={filteredTransactions} filter={filter} currency={currency} />
       </div>
       <div className="bg-white p-4 sm:p-6 rounded-xl shadow-md h-[320px]">
         <h3 className="text-lg font-semibold text-slate-800 mb-4 text-center">{getChartTitle()}</h3>
-        <CategoryPieChart data={expenseDataByCategory} categories={categories} />
+        <CategoryPieChart data={expenseDataByCategory} categories={categories} currency={currency} />
       </div>
     </div>
   );

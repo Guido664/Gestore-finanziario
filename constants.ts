@@ -9,3 +9,11 @@ export const DEFAULT_CATEGORIES: Category[] = [
   { id: 'health', name: 'Salute', color: '#ec4899' }, // pink-500
   { id: 'other', name: 'Altro', color: '#6b7280' }, // gray-500
 ];
+
+export const CURRENCIES = [
+  { code: 'EUR', name: 'Euro', symbol: '€' },
+  { code: 'USD', name: 'US Dollar', symbol: '$' },
+  { code: 'GBP', name: 'British Pound', symbol: '£' },
+  { code: 'JPY', name: 'Japanese Yen', symbol: '¥' },
+  { code: 'CHF', name: 'Swiss Franc', symbol: 'CHF' },
+];

@@ -6,13 +6,27 @@ import type { Filter } from '../App';
 interface TrendChartProps {
   data: Transaction[];
   filter: Filter;
+  currency?: string;
 }
 
-const TrendChart: React.FC<TrendChartProps> = ({ data, filter }) => {
+const TrendChart: React.FC<TrendChartProps> = ({ data, filter, currency }) => {
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(value);
+    if (currency) {
+        return new Intl.NumberFormat('it-IT', { style: 'currency', currency }).format(value);
+    }
+    return new Intl.NumberFormat('it-IT').format(value);
   };
+  
+  const yAxisFormatter = (value: number) => {
+    const options: Intl.NumberFormatOptions = { notation: 'compact', compactDisplay: 'short' };
+    if (currency) {
+      options.style = 'currency';
+      options.currency = currency;
+    }
+    return new Intl.NumberFormat('it-IT', options).format(value);
+  };
+
 
   const chartData = useMemo(() => {
     if (filter.mode === 'month') {
@@ -143,7 +157,10 @@ const TrendChart: React.FC<TrendChartProps> = ({ data, filter }) => {
         >
           <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
           <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-          <YAxis tickFormatter={(value) => `€${value}`} tick={{ fontSize: 12 }} />
+          <YAxis 
+            tickFormatter={yAxisFormatter} 
+            tick={{ fontSize: 12 }} 
+          />
           <Tooltip formatter={(value: number, name: string) => [formatCurrency(value), name]} />
           <Legend wrapperStyle={{fontSize: '12px'}} />
           <Line type="monotone" dataKey="Entrate" stroke="#10b981" strokeWidth={2} activeDot={{ r: 6 }} />
