@@ -1,5 +1,5 @@
 {
-  "name": "copy-of-gestore-finanziario-personale",
+  "name": "copy-of-gestore-finanziario-ai",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -11,7 +11,11 @@
   "dependencies": {
     "react": "^19.2.0",
     "recharts": "^3.2.1",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "@google/genai": "^1.28.0",
+    "@supabase/supabase-js": "^2.45.0",
+    "@supabase/auth-ui-react": "^0.4.10",
+    "@supabase/auth-ui-shared": "^0.1.8"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
