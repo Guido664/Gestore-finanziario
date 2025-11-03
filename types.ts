@@ -16,7 +16,7 @@ export interface Transaction {
 }
 
 export interface Category {
-  id: string; // Può essere UUID o una stringa predefinita come 'food'
+  id:string;
   name: string;
   color: string;
 }

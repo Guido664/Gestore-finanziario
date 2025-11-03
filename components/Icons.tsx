@@ -116,9 +116,3 @@ export const LightBulbIcon: React.FC<IconProps> = (props) => (
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 0 0 1.5-.189m-1.5.189a6.01 6.01 0 0 1-1.5-.189m3.75 7.478a12.06 12.06 0 0 1-4.5 0m3.75 2.311a6.01 6.01 0 0 0-1.5-1.84M12 2.25a6.01 6.01 0 0 0-1.5 11.662M12 2.25a6.01 6.01 0 0 1 1.5 11.662m0 0a6.01 6.01 0 0 1-3 0m3 0a6.01 6.01 0 0 1 1.758-4.189m-1.758 4.189a6.01 6.01 0 0 0-1.758-4.189m0 0a6.01 6.01 0 0 1-3 0m3 0a6.01 6.01 0 0 0-3 0" />
     </svg>
 );
-
-export const ArrowLeftStartOnRectangleIcon: React.FC<IconProps> = (props) => (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" {...props}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3h12.75" />
-    </svg>
-);
